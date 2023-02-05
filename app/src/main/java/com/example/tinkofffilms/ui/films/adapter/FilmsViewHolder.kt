@@ -17,6 +17,7 @@ class FilmsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             nameEn.text = item.nameEn
             genre.text = item.genres
             favourite.isVisible = item.favourite
+            rating.text = item.rating
         }
     }
 }

@@ -1,12 +1,13 @@
 package com.example.tinkofffilms.ui.film_details
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.bundleOf
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
 import com.bumptech.glide.Glide
 import com.example.tinkofffilms.R
@@ -24,14 +25,18 @@ class FilmDetailsFragment : Fragment(R.layout.fragment_film_details) {
     }
 
     private val filmId: Int by lazy { arguments?.getInt(FilmsFragment.ID) ?: 0 }
+
     private val isFavourite: Boolean by lazy {
         arguments?.getBoolean(FilmsFragment.IS_FAVOURITE) ?: false
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            parentFragmentManager.popBackStack()
+        }
         with(binding) {
-            btnBack.setOnClickListener { findNavController().popBackStack() }
+            btnBack.setOnClickListener { parentFragmentManager.popBackStack() }
             errorScreen.btnRepeat.setOnClickListener { viewModel.loadFilm(filmId, isFavourite) }
         }
         viewModel.loadFilm(filmId, isFavourite)
@@ -68,6 +73,15 @@ class FilmDetailsFragment : Fragment(R.layout.fragment_film_details) {
             description.text = item.description
             genres.text = item.genres
             countries.text = item.countries.joinToString()
+        }
+    }
+
+    companion object {
+        const val TAG = "FilmDetailsFragment"
+        fun newInstance(id: Int): FilmDetailsFragment {
+            val fragment = FilmDetailsFragment()
+            fragment.arguments = bundleOf(FilmsFragment.ID to id)
+            return fragment
         }
     }
 }

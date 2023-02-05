@@ -88,12 +88,27 @@
             android:id="@+id/favourite"
             android:layout_width="18dp"
             android:layout_height="18dp"
-            android:visibility="gone"
             android:layout_marginEnd="15dp"
             android:src="@drawable/rating"
-            app:layout_constraintBottom_toBottomOf="@id/genre"
+            app:layout_constraintBottom_toTopOf="@id/rating"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/name" />
+
+        <TextView
+            android:id="@+id/rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="11dp"
+            android:background="@color/green"
+            android:gravity="center"
+            android:paddingHorizontal="4dp"
+            android:textColor="@color/white"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="@id/genre"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/favourite"
+            tools:text="8.0" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -103,7 +103,6 @@ class FilmsViewModel(private val repository: IFilmsRepository) : ViewModel() {
                 nameRuContainsQuery || nameEnContainsQuery || genresContainsQuery
             }
             _states.emit(FilmsState.Result(searchResult))
-
         } else if (cachedItems.isNotEmpty()) {
             _states.emit(FilmsState.Result(cachedItems))
         }

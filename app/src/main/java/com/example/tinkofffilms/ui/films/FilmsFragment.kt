@@ -1,5 +1,6 @@
 package com.example.tinkofffilms.ui.films
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import androidx.core.os.bundleOf
@@ -8,8 +9,8 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.fragment.findNavController
 import by.kirich1409.viewbindingdelegate.viewBinding
+import com.example.tinkofffilms.MainActivity
 import com.example.tinkofffilms.R
 import com.example.tinkofffilms.databinding.FragmentFilmsBinding
 import com.example.tinkofffilms.di.ServiceLocator
@@ -27,8 +28,15 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
 
     private val adapter: FilmsAdapter = FilmsAdapter(::onClick, ::onLongClick)
 
+    private var lastOpenedFilmId: Int = UNKNOWN_FILM_ID
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lastOpenedFilmId = savedInstanceState?.getInt(ID, UNKNOWN_FILM_ID) ?: UNKNOWN_FILM_ID
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (isLandscape) onClick(viewModel.cachedItems.find { it.id == lastOpenedFilmId }?: viewModel.cachedItems[0])
+
         with(binding) {
             rvFilms.adapter = adapter
             initButtons()
@@ -37,6 +45,10 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
         viewModel.states.onEach(::render).launchIn(viewLifecycleOwner.lifecycleScope)
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(ID, lastOpenedFilmId)
+    }
 
     private fun render(state: FilmsState) {
         with(binding) {
@@ -56,6 +68,7 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
                     content.isVisible = true
                     errorScreen.root.isVisible = false
                     progressBar.isVisible = false
+                    btnNotFound.isVisible = adapter.items.isEmpty()
                 }
             }
         }
@@ -97,8 +110,11 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
     }
 
     private fun onClick(film: FilmPreviewUi) {
-        val bundle = bundleOf(ID to film.id, IS_FAVOURITE to film.favourite)
-        findNavController().navigate(R.id.filmInfoFragment, bundle)
+        lastOpenedFilmId = film.id
+        requireActivity().supportFragmentManager.setFragmentResult(
+            MainActivity.FRAGMENT_RESULT_KEY,
+            bundleOf(ID to film.id)
+        )
     }
 
     private fun onLongClick(film: FilmPreviewUi) {
@@ -119,6 +135,8 @@ class FilmsFragment : Fragment(R.layout.fragment_films) {
     }
 
     companion object {
+        const val UNKNOWN_FILM_ID = -1
+        const val TAG = "FilmsFragment"
         const val ID = "id"
         const val IS_FAVOURITE = "is_favourite"
     }
